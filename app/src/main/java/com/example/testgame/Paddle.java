@@ -1,18 +1,15 @@
 package com.example.testgame;
+
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-
-public class Ball {
+public class Paddle {
     private Point position;
-    private Point size;
+    public static Point size = new Point(40,120);
     private Point velocity;
-    public Ball(Point position, Point size,Point velocity) {
+    public Paddle(Point position,Point velocity) {
         this.position = position;
-        this.size = size;
         this.velocity = velocity;
     }
     public void draw(Canvas c)
@@ -21,17 +18,16 @@ public class Ball {
         p.setColor(Color.WHITE);
         c.drawRect(position.x,position.y,position.x + size.x,position.y + size.y,p);
     }
-    public void move(SurfaceHolder holder)
+    public void move(int mode)
     {
-        if(position.x + size.x > holder.getSurfaceFrame().width() || position.x < 0)
+        if(mode == 1)
         {
-            velocity.x *= -1;
+            setPosition(new Point(position.x ,position.y + velocity.y));
         }
-        if(position.y + size.y > holder.getSurfaceFrame().height() || position.y < 0)
+        else if(mode == 2)
         {
-            velocity.y *= -1;
+            setPosition(new Point(position.x ,position.y - velocity.y));
         }
-        setPosition(new Point(position.x + velocity.x,position.y + velocity.y));
     }
     public Point getPosition() {
         return position;
@@ -49,4 +45,5 @@ public class Ball {
         this.size = size;
     }
 }
+
 

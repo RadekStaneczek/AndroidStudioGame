@@ -14,7 +14,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private Paint p = new Paint();
     private Ball b;
-    private SurfaceHolder holder;
+
+    private Paddle p1,p2;
+    public SurfaceHolder holder;
     private Gameloop gameloop;
     public GamePanel(Context context) {
         super(context);
@@ -22,20 +24,24 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         holder.addCallback(this);
         p.setColor(Color.RED);
         gameloop = new Gameloop(this);
-        b = new Ball(new Point(50,50),new Point(20,20),new Point(10,10));
+
     }
     public void render()
     {
         Canvas c = holder.lockCanvas();
         c.drawColor(Color.BLACK);
         b.draw(c);
-
+        p1.draw(c);
+        p2.draw(c);
         holder.unlockCanvasAndPost(c);
 
-        b.move();
+        b.move(holder);
     }
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
+        b = new Ball(new Point(holder.getSurfaceFrame().width()/2,holder.getSurfaceFrame().height()/2),new Point(20,20),new Point(5,5));
+        p1 = new Paddle(new Point(50,holder.getSurfaceFrame().height()/2-Paddle.size.y/2),new Point(20,20));
+        p2 = new Paddle(new Point(holder.getSurfaceFrame().width()-Paddle.size.x-50,holder.getSurfaceFrame().height()/2-Paddle.size.y/2),new Point(20,20));
         gameloop.startGameLoop();
     }
 
