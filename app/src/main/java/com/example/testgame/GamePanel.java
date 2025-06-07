@@ -10,12 +10,14 @@ import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private Paint p = new Paint();
     private Ball b;
 
-    private Paddle p1,p2;
+    public Paddle p1,p2;
     public SurfaceHolder holder;
     private Gameloop gameloop;
     public GamePanel(Context context) {
@@ -35,7 +37,10 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         p2.draw(c);
         holder.unlockCanvasAndPost(c);
 
-        b.move(holder);
+        b.move(holder, new ArrayList<Paddle>() {{
+            add(p1);
+            add(p2);
+        }});
     }
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {

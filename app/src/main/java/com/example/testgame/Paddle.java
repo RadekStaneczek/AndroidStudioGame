@@ -22,11 +22,11 @@ public class Paddle {
     {
         if(mode == 1)
         {
-            setPosition(new Point(position.x ,position.y + velocity.y));
+            setPosition(new Point(position.x ,position.y - velocity.y));
         }
         else if(mode == 2)
         {
-            setPosition(new Point(position.x ,position.y - velocity.y));
+            setPosition(new Point(position.x ,position.y + velocity.y));
         }
     }
     public Point getPosition() {
