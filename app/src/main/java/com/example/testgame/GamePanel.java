@@ -15,7 +15,7 @@ import java.util.ArrayList;
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private Paint p = new Paint();
-    private Ball b;
+    public Ball b;
 
     public Paddle p1,p2;
     public SurfaceHolder holder;
@@ -30,17 +30,19 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
     public void render()
     {
-        Canvas c = holder.lockCanvas();
-        c.drawColor(Color.BLACK);
-        b.draw(c);
-        p1.draw(c);
-        p2.draw(c);
-        holder.unlockCanvasAndPost(c);
+        p1.checkCollision(b);
+        p2.checkCollision(b);
 
-        b.move(holder, new ArrayList<Paddle>() {{
-            add(p1);
-            add(p2);
-        }});
+        b.move(holder);
+
+        Canvas c = holder.lockCanvas();
+        if (c != null) {
+            c.drawColor(Color.BLACK);
+            b.draw(c);
+            p1.draw(c);
+            p2.draw(c);
+            holder.unlockCanvasAndPost(c);
+        }
     }
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {

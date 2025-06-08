@@ -15,14 +15,12 @@ public class Ball {
     private Point position;
     private Point size;
     private Point velocity;
-    private Map<String,Object> collisionState;
-    public Ball(Point position, Point size,Point velocity) {
+    public Event event;
+    public Ball(Point position, Point size,Point velocity)
+    {
         this.position = position;
         this.size = size;
         this.velocity = velocity;
-        this.collisionState = new HashMap();
-        collisionState.put("x",false);
-        collisionState.put("y",false);
     }
     public void draw(Canvas c)
     {
@@ -30,45 +28,16 @@ public class Ball {
         p.setColor(Color.WHITE);
         c.drawRect(position.x,position.y,position.x + size.x,position.y + size.y,p);
     }
-    public void move(SurfaceHolder holder,ArrayList<Paddle> paddles)
+    public void move(SurfaceHolder holder)
     {
-        checkCollision(holder,paddles);
-        if(collisionState.get("x").equals(true))
-        {
+        if((event != null && event.type == Event.Type.WallPaddle) || position.x < 0 || position.x > holder.getSurfaceFrame().width()){
             velocity.x *= -1;
         }
-        if(collisionState.get("y").equals(true))
-        {
+        if((event != null && event.type == Event.Type.TopPaddle) || position.y < 0 || position.y > holder.getSurfaceFrame().height()){
             velocity.y *= -1;
         }
-        setPosition(new Point(position.x + velocity.x,position.y + velocity.y));
-        collisionState.replace("x",false);
-        collisionState.replace("y",false);
-    }
-    private void checkCollision(SurfaceHolder holder,ArrayList<Paddle> paddles)
-    {
-        for (Paddle paddle:paddles) {
-            Point paddlePos = paddle.getPosition();
-            Point paddleSize = paddle.getSize();
-            if(position.x + size.x >= paddlePos.x && position.x <= paddlePos.x)
-            {
-                collisionState.replace("x",true);
-            }
-            if(position.y >= paddlePos.y && position.y + size.y <= paddlePos.y + paddleSize.y && position.x + size.x >= paddlePos.x)
-            {
-                collisionState.replace("y",true);
-            }
-
-        }
-        if(position.x + size.x >= holder.getSurfaceFrame().width() || position.x <= 0)
-        {
-            collisionState.replace("x",true);
-        }
-        if(position.y + size.y >= holder.getSurfaceFrame().height() || position.y <= 0)
-        {
-            collisionState.replace("y",true);
-        }
-
+        setPosition(new Point(position.x + velocity.x, position.y + velocity.y));
+        event = null;
     }
     public Point getPosition() {
         return position;
@@ -84,6 +53,10 @@ public class Ball {
 
     public void setSize(Point size) {
         this.size = size;
+    }
+
+    public void setEvent(Event event) {
+        this.event = event;
     }
 }
 
