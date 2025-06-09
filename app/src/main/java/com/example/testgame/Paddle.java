@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.view.SurfaceHolder;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,8 @@ public class Paddle {
     private Point position;
     public static Point size = new Point(40,120);
     private Point velocity;
+    private Boolean UP = false;
+    private Boolean DOWN = false;
     public Paddle(Point position,Point velocity) {
         this.position = position;
         this.velocity = velocity;
@@ -22,82 +25,57 @@ public class Paddle {
         p.setColor(Color.WHITE);
         c.drawRect(position.x,position.y,position.x + size.x,position.y + size.y,p);
     }
-    public void checkCollision(Ball b)
+    public void AImove(Ball b)
     {
-        ArrayList<CollisionRule> rules = new ArrayList<>();
-        Rect paddleTop = new Rect(
-                position.x,
-                position.y,
-                position.x + size.x,
-                position.y
-        );
-        Rect paddleBottom = new Rect(
-                position.x + size.x,
-                position.y + size.y,
-                position.x + size.x,
-                position.y + size.y
-        );
-        Rect paddleWall = new Rect(
-                position.x,
-                position.y,
-                position.x + size.x,
-                position.y + size.y
-        );
-        Rect ball = new Rect(
-                b.getPosition().x,
-                b.getPosition().y,
-                b.getPosition().x + b.getSize().x,
-                b.getPosition().y + b.getSize().y
-        );
-        rules.add(new CollisionRule() {
-            @Override
-            public boolean check(){
-                if(paddleTop.intersect(ball) || paddleBottom.intersect(ball))
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onCollision(){
-                Event event = new Event(Event.Type.TopPaddle);
-                b.setEvent(event);
-            }
-        });
-        rules.add(new CollisionRule() {
-            @Override
-            public boolean check(){
-                if(paddleWall.intersect(ball))
-                {
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public void onCollision(){
-                Event event = new Event(Event.Type.WallPaddle);
-                b.setEvent(event);
-            }
-        });
-        rules.forEach(rule -> {
-            if(rule.check())
-            {
-                rule.onCollision();
-            }
-        });
+        position.y = b.getPosition().y;
     }
-    public void move(int mode)
+    public void move()
     {
-        if(mode == 1)
+        if(UP == true)
         {
-            setPosition(new Point(position.x ,position.y - velocity.y));
+            position.y -= velocity.y;
         }
-        else if(mode == 2)
+        else if (DOWN == true)
         {
-            setPosition(new Point(position.x ,position.y + velocity.y));
+            position.y += velocity.y;
         }
+
+    }
+    public void checkCollision(Ball b, SurfaceHolder holder)
+    {
+
+        Rect paddleRect = new Rect(position.x, position.y, position.x + size.x, position.y + size.y);
+        Rect ballRect = new Rect(b.getPosition().x, b.getPosition().y, b.getPosition().x + b.getSize().x, b.getPosition().y + b.getSize().y);
+
+        if (Rect.intersects(paddleRect, ballRect)) {
+            Point prevPos = b.getPreviousPosition();
+
+            boolean cameFromLeft = prevPos.x + b.getSize().x <= position.x;
+            boolean cameFromRight = prevPos.x >= position.x + size.x;
+            boolean cameFromTop = prevPos.y + b.getSize().y <= position.y;
+            boolean cameFromBottom = prevPos.y >= position.y + size.y;
+
+            if (cameFromLeft || cameFromRight) {
+                b.onCollision(new Event(Event.Type.WallPaddle));
+            } else if (cameFromTop || cameFromBottom) {
+                b.onCollision(new Event(Event.Type.TopPaddle));
+            }
+        }
+        if(position.y < 0)
+        {
+            position.y = 0;
+        }
+        else if (position.y + size.y > holder.getSurfaceFrame().height()) {
+            position.y = holder.getSurfaceFrame().height() - size.y;
+        }
+    }
+    public void moveUp()
+    {
+        UP = true;
+    }
+    public void moveDown()
+    {
+        DOWN = true;
     }
     public Point getPosition() {
         return position;
@@ -113,6 +91,11 @@ public class Paddle {
 
     public void setSize(Point size) {
         this.size = size;
+    }
+
+    public void stopMoving() {
+        UP = false;
+        DOWN = false;
     }
 }
 
